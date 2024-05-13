@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>サンプル</title>
+<style type="text/css">
+#mycanvas{
+border:1px solid #000000;
+}
+</style>
+</head>
+<body>
+
+<p>キャンバスで直線を描きます</p>
+
+<canvas id="mycanvas" width="600" height="200"></canvas>
+
+<script>
+let startx = 0;
+let starty = 0;
+
+function mouseDown(event){
+    startx = event.offsetX;
+    starty = event.offsetY;
+
+    context.beginPath();
+    context.arc(startx, starty, 10, 0, 2 * Math.PI);
+    context.stroke();
+}
+
+function mouseUp(event){
+    context.beginPath();
+    context.moveTo(startx, starty);
+    context.lineTo(event.offsetX, event.offsetY);
+    context.stroke();
+
+    context.beginPath();
+    context.arc(event.offsetX, event.offsetY, 10, 0, 2 * Math.PI);
+    context.stroke();
+}
+
+let mycanvas = document.getElementById('mycanvas');
+let context = mycanvas.getContext('2d');
+
+mycanvas.addEventListener('mousedown', mouseDown);
+mycanvas.addEventListener('mouseup', mouseUp);
+</script>
+
+</body>
+</html>

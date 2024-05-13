@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TODO List</title>
+</head>
+<body>
+    <h2>TODO List</h2>
+    <input type="text" id="todoInput" placeholder="Enter your TODO item" value="aa">
+    <button onclick="addTodo()">Add</button>
+    <ul id="todoList"></ul>
+
+    <script>
+        function addTodo() {
+            var todoInput = document.getElementById("todoInput");
+            var todoList = document.getElementById("todoList");
+
+            var todoItemText = todoInput.value;
+            if (todoItemText.trim() !== "") {
+                var li = document.createElement("li");
+                li.textContent = todoItemText;
+
+                // リストからTODOアイテムを削除するボタンを追加
+                var removeButton = document.createElement("button");
+                removeButton.textContent = "Remove";
+                removeButton.onclick = function() {
+                    todoList.removeChild(li);
+                };
+
+                li.appendChild(removeButton);
+                todoList.appendChild(li);
+                todoInput.value = ""; // 入力欄を空にする
+            } else {
+                alert("Please enter a TODO item.");
+            }
+        }
+    </script>
+</body>
+</html>
