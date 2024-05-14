@@ -1,15 +1,11 @@
 
+//管理
+let state = [];
 
 
-
-//項の管理
-let ntnElements = [];
-
-
-
-//配列を軌道分析表記法に変換
+//stateを軌道分析表記法に変換
 const concatElements = index => {
-    let e = ntnElements[index];
+    let e = state[index];
     return (e.rdSide +
     e.ulSide +
         '(' +
@@ -25,16 +21,14 @@ const concatElements = index => {
     ).replace('(-)','')
 };
 
-
-
-//軌道分析表記法を配列に変換
+//軌道分析表記法を配列に変換しstateに入れる
 const splitElements = (element,index) => {
-    let e = ntnElements[index];
+    let e = state[index];
     let n = element.replace(/^([^\.)]*)\./,'$1(-).');
     let regExp = /^([0-6]{0,2})\(([1-5]*?)-([1-5]*?)\)\.([qhva]?)([-+]?)\.([EWSNXYZKL]?)([EWSNXYZKL]*)/
     let str = n.match(regExp);
     if (regExp.test(n)){
-        ntnElements.splice(index,1,{
+        state.splice(index,1,{
             rdSide: str[1].charAt(0),
             ulSide: str[1].charAt(1),
             dsSide: str[2],
@@ -46,7 +40,7 @@ const splitElements = (element,index) => {
         })
     } else {
         console.log('第' + (index + 1) +'項の入力表記が適切ではありません');
-        ntnElements.splice(index,1,{
+        state.splice(index,1,{
             rdSide: "",
             ulSide: "",
             dsSide: "",
@@ -64,13 +58,6 @@ const splitElements = (element,index) => {
 
 
 //配列例
-splitElements('34.q-.SW',0)
-splitElements('02.q-.EW',1)
-splitElements('24(3-).q-.EW',2)
-splitElements('23.q-.WW',3)
-
-
-
 splitElements('45.q-.SW',0)
 splitElements('35(-4).q-.WW',1)
 splitElements('03.q-.EW',2)
@@ -81,39 +68,17 @@ splitElements('45.q+.EN',5)
 
 
 
-/*
-splitElements('45.q-.SW',0)
-splitElements('35(-4).q-.WE',1)
-splitElements('25(3-4).q-.EW',2)
-splitElements('34.q-.ES',3)
-*/
 
-/*
-splitElements('34.q+.SW',0)
-splitElements('34.q+.WS',1)
-splitElements('34.q-.SW',2)
-splitElements('34.q-.SW',3)
-*/
-
-
-
-
-
-
-const resetnotationElements = () => {
+//新しいセクションの追加
+const resetNotationElements = () => {
     let elements = document.querySelectorAll('#sectionList input');
     elements.forEach ((element, index) => {
         splitElements(element.value,index);
     });
 }
-
-
-
-
-
 const addSectionButton = document.getElementById('addSection');
 addSectionButton.addEventListener("click", () => {
-    ntnElements.push({
+    state.push({
         rdSide: "",
         ulSide: "",
         dsSide: "",
@@ -123,44 +88,39 @@ addSectionButton.addEventListener("click", () => {
         startPenDir: "",
         endPenDir: "",
     });
-    redisplaySections();
+    reDisplaySections();
 })
-
-
-const redisplaySections = () => {
+const reDisplaySections = () => {
     let sectionList = document.getElementById('sectionList')
     sectionList.innerHTML = ""
     
-    for (let index = 0; index < ntnElements.length; index++) {
+    for (let index = 0; index < state.length; index++) {
         let listItem = document.createElement("div");
         
         let sectionInput = document.createElement("input");
         sectionInput.placeholder = "表記を入力";
         sectionInput.value = concatElements(index); //あとでforEachに変える
         sectionInput.oninput = () => {
-            resetnotationElements();
-            redisplayEverything();
+            resetNotationElements();
+            reDisplayEverything();
         }
-        
         let upButton = document.createElement("button");
         upButton.textContent = "▲";
         upButton.onclick = () => {
             moveSectionUp(index);
-            redisplayEverything();
+            reDisplayEverything();
         }
-        
         let downButton = document.createElement("button");
         downButton.textContent = "▼";
         downButton.onclick = () => {
             moveSectionDown(index);
-            redisplayEverything();
+            reDisplayEverything();
         }
-        
         let deleteButton = document.createElement("button");
         deleteButton.textContent = "×";
         deleteButton.onclick = () => {
             deleteSection(index);
-            redisplayEverything();
+            reDisplayEverything();
         }
         
         listItem.appendChild(document.createTextNode('第' + (index + 1) + '項 '));
@@ -169,61 +129,60 @@ const redisplaySections = () => {
         listItem.appendChild(downButton);
         listItem.appendChild(deleteButton);
         sectionList.appendChild(listItem);
-
     }
-    //ntnElements.forEach((index) => { });
+    //state.forEach((index) => { });
 }
-
-
-
 const moveSectionUp = (index) => {
     if (index > 0) {
-        let temp = ntnElements[index];
-        ntnElements[index] = ntnElements[index - 1];
-        ntnElements[index - 1] = temp;
-        redisplaySections();
+        let temp = state[index];
+        state[index] = state[index - 1];
+        state[index - 1] = temp;
+        reDisplaySections();
     }
 }
-
-
 const moveSectionDown = (index) => {
-    if (index < ntnElements.length - 1) {
-        let temp = ntnElements[index];
-        ntnElements[index] = ntnElements[index + 1];
-        ntnElements[index + 1] = temp;
-        redisplaySections();
+    if (index < state.length - 1) {
+        let temp = state[index];
+        state[index] = state[index + 1];
+        state[index + 1] = temp;
+        reDisplaySections();
     }
 }
-
 const deleteSection = (index) => {
-    ntnElements.splice(index,1);
-    redisplaySections();
+    state.splice(index,1);
+    reDisplaySections();
 }
 
-
-redisplaySections();
-
+reDisplaySections();
 
 
 
 
+//canvas
 let canvas = document.getElementById("canvas");
 let context = canvas.getContext("2d");
 
 
 
 
-
+//モード
 let isRightHandMode = true;
 let isdoubleArcMode = false;
 let isLeanMode = false; //実装予定
 let isConnectionMode = false; //実装予定
 
+//色の設定
+const colorDB = {
+    w:"#FFFFFF",
+    ltGy:"#EEEEEE",
+    mGy:"#808080",
+    dkGy:"#222222",
+    bk:"#000000",
 
+    dkR:"#993D3D",
+    dkB:"#3D3D99",
 
-
-
-
+};
 
 //位置関係,座標の設定
 const lineNum = 7;
@@ -235,11 +194,7 @@ const baseLineWidthY = baseLineWidthX;
 const arcRadius = baseLineWidthY / 2.5;
 const pointRadius = baseLineWidthY / 10;
 
-
-
-
-
-//ブールから符号への変換
+//汎用
 const sign = (boolean) => {
     if (boolean == null || boolean == true) {
         return 1;
@@ -248,16 +203,12 @@ const sign = (boolean) => {
     }
 };
 
-
 const rightAngles = (num) => {
     return Math.PI / 2 * num;
 };
 
 
-
-
-
-//軸番号を座標に変換(ハンドモード変更対応)
+//表記要素を座標と角度に変換(ハンドモード変更に対応済み)
 const numtoX = num => {
     let pos = marginX + baseLineWidthX * parseInt(num)
     if (isRightHandMode) {
@@ -266,18 +217,10 @@ const numtoX = num => {
         return pos;
     }
 };
-
-//項リストのインデックスを座標に変換
 const indextoY = index => {
     return marginY + baseLineWidthY * index;
 };
 
-
-
-
-
-
-//軸番号とインデックスと方位を座標に変換(ハンドモード変更対応)
 const toShiftedX = (num,dir,isPalmSide) => {
     let shift;
     switch (dir) {
@@ -288,7 +231,6 @@ const toShiftedX = (num,dir,isPalmSide) => {
     }
     return numtoX(num) + shift * sign(isPalmSide) * sign(isRightHandMode) * arcRadius;
 };
-
 const toShiftedY = (index,dir,isPalmSide) => {
     let shift;
     switch (dir) {
@@ -300,10 +242,6 @@ const toShiftedY = (index,dir,isPalmSide) => {
     return indextoY(index) + shift * sign(isPalmSide) * arcRadius;
 };
 
-
-
-
-//方位をラジアンに変換(ハンドモード変更対応)
 const penDirtoRad = (dir) => {
     let rad;
     switch (dir) {
@@ -314,8 +252,6 @@ const penDirtoRad = (dir) => {
     }
     return rightAngles(1) * rad * sign(isRightHandMode)
 };
-
-//始方位と終方位と回転方向を中心角(ラジアン)に変換(ハンドモード対応)
 const toCentralRad = (startAngle,endAngle,rotDir) => {
     let difference = endAngle - startAngle
     if ((rotDir == '+') == isRightHandMode) {
@@ -353,28 +289,6 @@ const toCentralRad = (startAngle,endAngle,rotDir) => {
     
     */
 }
-
-
-
-
-
-
-
-
-
-//色の設定
-const colorDB = {
-    w:"#FFFFFF",
-    ltGy:"#EEEEEE",
-    mGy:"#808080",
-    dkGy:"#222222",
-    bk:"#000000",
-
-    dkR:"#993D3D",
-    dkB:"#3D3D99",
-
-};
-
 
 
 //直線の描画関数
@@ -425,11 +339,11 @@ const drawTriangle = (x,y,base) => {
 
 
 
-
-
+//実際の描画
 const clearCanvas = () => {
     context.clearRect(0, 0, canvas.width, canvas.height);
-    //context.fillRect(0, 0, canvas.width, canvas.height);
+    context.fillStyle = colorDB.w;
+    context.fillRect(0, 0, canvas.width, canvas.height);
 };    
 
 const displayBaseLine = () => {
@@ -548,7 +462,6 @@ const displayRot = (element, index) => {
         let base = arcRadius / 5;
         let height = arcRadius / 3 * ((element.rotDir == '+') ? 1 : -1) * sign(isPalmSide);
         
-        
         let heightX = 0;
         let heightY = 0;
         let baseX = 0;
@@ -588,7 +501,6 @@ const displayRot = (element, index) => {
 
     }
 
-    
 
     displayRotArc();
     displayRotPoint();
@@ -606,27 +518,20 @@ const displayRot = (element, index) => {
     }
 };
 
-const redisplayEverything = () => {
+const reDisplayEverything = () => {
     clearCanvas();
     displayBaseLine();
-    ntnElements.forEach((element, index) => {
+    state.forEach((element, index) => {
         displayHoldLine(element, index);
         displayHoldPoints(element, index);
         displayBetweenPoints(element, index);
         displayRot(element, index);
     })
 };
-
-redisplayEverything();
-
+reDisplayEverything();
 
 
-
-
-
-
-
-
+//ボタンの処理
 const RHModeButton = document.getElementById("toggleRightHandMode");
 const SCModeButton = document.getElementById("toggleSmoothConnectionMode");
 const DAModeButton = document.getElementById("doubleArcMode");
@@ -634,13 +539,12 @@ const DAModeButton = document.getElementById("doubleArcMode");
 RHModeButton.addEventListener("click", () => {
     isRightHandMode = !isRightHandMode;
     RHModeButton.textContent = isRightHandMode ? "現在：右手モード" : "現在：左手モード";
-    redisplayEverything();
+    reDisplayEverything();
 });
-
 DAModeButton.addEventListener("click", () => {
     isdoubleArcMode = !isdoubleArcMode;
     DAModeButton.textContent = isdoubleArcMode ? "現在：掌側表示モード" : "現在：両側表示モード";
-    redisplayEverything();
+    reDisplayEverything();
 });
 
 
@@ -648,7 +552,7 @@ DAModeButton.addEventListener("click", () => {
 SCModeButton.addEventListener("click", () => {
     isLeanMode = !isLeanMode;
     SCModeButton.textContent = isLeanMode ? "現在：見栄えモード" : "現在：指方向-方位一致モード";
-    redisplayEverything();
+    reDisplayEverything();
 });
 */
 
