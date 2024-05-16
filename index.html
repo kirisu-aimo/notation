@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>線譜エディタ</title>
+    <title>図解表記システムエディタ</title>
     <style type="text/css">
       #canvas{
         border:1px solid #000000;
@@ -11,11 +11,13 @@
     </style>
   </head>
   <body>
-    <h1 id="header"> 図解表記システム </h1>
+    <h1 id="header"> 図解表記システムエディタ </h1>
+    <p>描画機能を切り替えたい場合、aキーを押しながらマウスを操作してください</p>
+    <p>Press 'a' key while operating mouse to switch the drawing function. </p>
+    <input type="button" id="addSection" value="Add section">
+    <ul id="sectionList"></ul>
     <button id="toggleRightHandMode" class="button-54">現在：右手モード</button>
     <button id="doubleArcMode" class="button-55">現在：掌側表示モード</button>
-    <input type="button" id="addSection" value="項を追加">
-    <ul id="sectionList"></ul>
     <div>
       <!--
       <p id="test1">0</p>
